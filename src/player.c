@@ -12,7 +12,7 @@ void player_init(Player *player, sfVector2u start_tile) {
 
 void player_destroy(Player *player) {}
 
-void player_update(Player *player, Tilemap *tilemap, double dt) {
+void player_update(Player *player, const Tilemap *tilemap, double dt) {
 	// velocity_normal tells which direction the player is going. You could
 	// avoid a vector for this but it simplifies if-else logic into vector
 	// multiplication.

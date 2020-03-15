@@ -35,7 +35,8 @@ sfVector2u to_tile_coords(sfVector2u map_coords);
 void tilemap_init(Tilemap *tilemap, const char *map_path);
 void tilemap_destroy(Tilemap *tilemap);
 
-TileId tilemap_get_tile(Tilemap *tilemap, sfVector2u pos);
-void tilemap_draw(Tilemap *tilemap, sfRenderWindow *window);
+TileId tilemap_get_tile(const Tilemap *tilemap, sfVector2u pos);
+void tilemap_draw(const Tilemap *tilemap, sfRenderWindow *window,
+		  const sfView *camera);
 
 #endif

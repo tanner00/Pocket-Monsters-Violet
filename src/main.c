@@ -46,7 +46,7 @@ int main(void) {
 			accumulator -= dt;
 		}
 
-		sfRenderWindow_clear(window, sfWhite);
+		sfRenderWindow_clear(window, sfBlack);
 
 		overworld_draw(&overworld, window);
 

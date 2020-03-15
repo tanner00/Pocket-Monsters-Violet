@@ -40,6 +40,6 @@ void overworld_draw(Overworld *overworld, sfRenderWindow *window) {
 	sfView_setCenter(camera, (sfVector2f){player->pos.x, player->pos.y});
 	sfRenderWindow_setView(window, camera);
 
-	tilemap_draw(map, window);
+	tilemap_draw(map, window, camera);
 	player_draw(player, window);
 }

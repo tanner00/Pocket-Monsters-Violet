@@ -1,4 +1,5 @@
 #include "include/tilemap.h"
+#include "include/math.h"
 #include "include/resources.h"
 
 #include <assert.h>
@@ -73,22 +74,53 @@ void tilemap_init(Tilemap *tilemap, const char *map_path) {
 
 void tilemap_destroy(Tilemap *tilemap) { free(tilemap->tiles); }
 
-TileId tilemap_get_tile(Tilemap *tilemap, sfVector2u pos) {
+TileId tilemap_get_tile(const Tilemap *tilemap, sfVector2u pos) {
 	assert(pos.x < tilemap->dimensions.x);
 	assert(pos.y < tilemap->dimensions.y);
 
 	return tilemap->tiles[pos.x + pos.y * tilemap->dimensions.x];
 }
 
-// @TODO: only draw what is on screen
-// @NOTE: this requires the camera view
-void tilemap_draw(Tilemap *tilemap, sfRenderWindow *window) {
+void tilemap_draw(const Tilemap *tilemap, sfRenderWindow *window,
+		  const sfView *camera) {
 	const sfVector2u dimensions = tilemap->dimensions;
 	const TileId *tiles = tilemap->tiles;
 	sfSprite *const *const tile_sprites = resources.tile_sprites;
 
-	for (size_t i = 0; i < dimensions.x; ++i) {
-		for (size_t j = 0; j < dimensions.y; ++j) {
+	const sfVector2f camera_center = sfView_getCenter(camera);
+	const sfVector2f camera_size = sfView_getSize(camera);
+
+	// This prevents the game from drawing the entire map at once because
+	// for even moderate sizes there's a huge drop in FPS.
+
+	// The camera's center is used to see what should be drawn on the
+	// screen.
+	// If you have a center point, you can convert to a bounding box
+	// if you know the size of the box.
+	// For example: left_extent = x_center - x_size / 2
+
+	// These world coordinates are then converted to tile coordinates to
+	// index into the tiles array. The +-1's tell the game to render a
+	// little over because half of a tile can be in the view of
+	// the camera.
+
+	// If a min or max exceeds the tile
+	// boundaries (< 0 or >= a dimension), clamp it so it doesn't index out
+	// of bounds.
+
+	const size_t x_min =
+		MAX((camera_center.x - camera_size.x / 2) / TILE_SIZE - 1, 0);
+	const size_t x_max =
+		MIN((camera_center.x + camera_size.x / 2) / TILE_SIZE + 1,
+		    dimensions.x);
+	const size_t y_min =
+		MAX((camera_center.y - camera_size.y / 2) / TILE_SIZE - 1, 0);
+	const size_t y_max =
+		MIN((camera_center.y + camera_size.y / 2) / TILE_SIZE + 1,
+		    dimensions.y);
+
+	for (size_t i = x_min; i < x_max; ++i) {
+		for (size_t j = y_min; j < y_max; ++j) {
 			const TileId tile_id = tiles[i + j * dimensions.x];
 
 			sfSprite *tile_sprite = tile_sprites[tile_id];

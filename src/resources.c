@@ -6,21 +6,28 @@
 
 Resources resources;
 
+// A lot of the game uses an atlas of images for performance (Fewer texture
+// swaps) and easier animation. This is a repetitive operation for the game, so
+// I made a helper function.
+sfSprite *make_cutout_sprite(const sfTexture *texture, sfIntRect cutout) {
+	sfSprite *sprite = sfSprite_create();
+	assert(sprite);
+	sfSprite_setTexture(sprite, texture, true);
+	sfSprite_setTextureRect(sprite, cutout);
+	return sprite;
+}
+
 void resources_init(void) {
 	sfTexture *player_atlas =
 		sfTexture_createFromFile("res/player.png", NULL);
 	assert(player_atlas);
 	resources.player_atlas = player_atlas;
 
-	sfSprite *player_sprite = sfSprite_create();
-	assert(player_sprite);
+	sfSprite *player_sprite = make_cutout_sprite(
+		player_atlas, (sfIntRect){0, 0, TILE_SIZE, TILE_SIZE});
 	resources.player_sprite = player_sprite;
 
-	sfSprite_setTexture(player_sprite, player_atlas, true);
-	sfIntRect idle_animation = {0, 0, TILE_SIZE, TILE_SIZE};
-	sfSprite_setTextureRect(player_sprite, idle_animation);
-
-	// The tiles are stored in a big image where the dimensions are
+	// The tiles are stored in a big image which has dimensions
 	// (16*n)x16 where n is the number of tiles. This layout makes it easy
 	// to go from TileId to what sprite should be rendered on screen.
 	sfTexture *const tile_atlas =
@@ -38,15 +45,9 @@ void resources_init(void) {
 
 	// Fill out all the information for each sprite in the tile atlas.
 	for (size_t i = 0; i < num_tile_sprites; ++i) {
-		// @TODO: We commonly make a sprite like this... Make this a
-		// function?
-		tile_sprites[i] = sfSprite_create();
-		assert(tile_sprites[i]);
-
-		sfSprite_setTexture(tile_sprites[i], tile_atlas, true);
-		const sfIntRect tile_cutout = {i * TILE_SIZE, 0, TILE_SIZE,
-					       TILE_SIZE};
-		sfSprite_setTextureRect(tile_sprites[i], tile_cutout);
+		tile_sprites[i] = make_cutout_sprite(
+			tile_atlas,
+			(sfIntRect){i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE});
 	}
 }
 
