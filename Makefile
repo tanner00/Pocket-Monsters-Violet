@@ -3,6 +3,7 @@ OUT := pocket_monsters_violet
 CC = gcc
 
 SRC_DIR := src
+INCLUDE_DIR := $(SRC_DIR)/include
 OBJ_DIR := obj
 
 SRC := $(wildcard $(SRC_DIR)/*.c)
@@ -22,7 +23,7 @@ run: all
 $(OUT): $(OBJ)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_DIR)/*.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):

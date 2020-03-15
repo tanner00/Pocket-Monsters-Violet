@@ -42,8 +42,7 @@ bool is_tile_solid(TileId tile) {
 }
 
 sfVector2u to_tile_coords(sfVector2u map_coords) {
-	return (sfVector2u){map_coords.x / TILE_SPRITE_SIZE,
-			    map_coords.y / TILE_SPRITE_SIZE};
+	return (sfVector2u){map_coords.x / TILE_SIZE, map_coords.y / TILE_SIZE};
 }
 
 void tilemap_init(Tilemap *tilemap, const char *map_path) {
@@ -95,8 +94,7 @@ void tilemap_draw(Tilemap *tilemap, sfRenderWindow *window) {
 			sfSprite *tile_sprite = tile_sprites[tile_id];
 			sfSprite_setPosition(
 				tile_sprite,
-				(sfVector2f){i * TILE_SPRITE_SIZE,
-					     j * TILE_SPRITE_SIZE});
+				(sfVector2f){i * TILE_SIZE, j * TILE_SIZE});
 			sfRenderWindow_drawSprite(window, tile_sprites[tile_id],
 						  NULL);
 		}

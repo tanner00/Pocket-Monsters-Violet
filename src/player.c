@@ -4,8 +4,8 @@
 #include <assert.h>
 
 void player_init(Player *player, sfVector2u start_tile) {
-	player->pos.x = start_tile.x * TILE_SPRITE_SIZE;
-	player->pos.y = start_tile.y * TILE_SPRITE_SIZE;
+	player->pos.x = start_tile.x * TILE_SIZE;
+	player->pos.y = start_tile.y * TILE_SIZE;
 	player->dest = player->pos;
 	player->speed = WALKING_SPEED;
 }
@@ -34,16 +34,16 @@ void player_update(Player *player, Tilemap *tilemap, double dt) {
 		velocity_normal = (sfVector2i){0, 0};
 		if (left) {
 			velocity_normal.x = -1;
-			player->dest.x = player->pos.x - TILE_SPRITE_SIZE;
+			player->dest.x = player->pos.x - TILE_SIZE;
 		} else if (right) {
 			velocity_normal.x = 1;
-			player->dest.x = player->pos.x + TILE_SPRITE_SIZE;
+			player->dest.x = player->pos.x + TILE_SIZE;
 		} else if (up) {
 			velocity_normal.y = -1;
-			player->dest.y = player->pos.y - TILE_SPRITE_SIZE;
+			player->dest.y = player->pos.y - TILE_SIZE;
 		} else if (down) {
 			velocity_normal.y = 1;
-			player->dest.y = player->pos.y + TILE_SPRITE_SIZE;
+			player->dest.y = player->pos.y + TILE_SIZE;
 		}
 
 		// Find what tile the player will be moving to.

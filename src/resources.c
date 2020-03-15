@@ -17,9 +17,8 @@ void resources_init(void) {
 	resources.player_sprite = player_sprite;
 
 	sfSprite_setTexture(player_sprite, player_atlas, true);
-	sfIntRect idle_animation = {0, 0, TILE_TEXTURE_SIZE, TILE_TEXTURE_SIZE};
+	sfIntRect idle_animation = {0, 0, TILE_SIZE, TILE_SIZE};
 	sfSprite_setTextureRect(player_sprite, idle_animation);
-	sfSprite_scale(player_sprite, (sfVector2f){TILE_SCALE, TILE_SCALE});
 
 	// The tiles are stored in a big image where the dimensions are
 	// (16*n)x16 where n is the number of tiles. This layout makes it easy
@@ -30,7 +29,7 @@ void resources_init(void) {
 	resources.tile_atlas = tile_atlas;
 
 	const size_t num_tile_sprites =
-		sfTexture_getSize(tile_atlas).x / TILE_TEXTURE_SIZE;
+		sfTexture_getSize(tile_atlas).x / TILE_SIZE;
 	sfSprite **const tile_sprites =
 		malloc(num_tile_sprites * sizeof(*tile_sprites));
 	assert(tile_sprites);
@@ -45,13 +44,9 @@ void resources_init(void) {
 		assert(tile_sprites[i]);
 
 		sfSprite_setTexture(tile_sprites[i], tile_atlas, true);
-		const sfIntRect tile_cutout = {i * TILE_TEXTURE_SIZE, 0,
-					       TILE_TEXTURE_SIZE,
-					       TILE_TEXTURE_SIZE};
+		const sfIntRect tile_cutout = {i * TILE_SIZE, 0, TILE_SIZE,
+					       TILE_SIZE};
 		sfSprite_setTextureRect(tile_sprites[i], tile_cutout);
-
-		sfSprite_scale(tile_sprites[i],
-			       (sfVector2f){TILE_SCALE, TILE_SCALE});
 	}
 }
 

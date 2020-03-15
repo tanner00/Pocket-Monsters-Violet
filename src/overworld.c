@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#define OVERWORLD_SCALE 4.0
+
 void overworld_init(Overworld *overworld) {
 	Player *const player = malloc(sizeof(*player));
 	assert(player);
@@ -16,6 +18,7 @@ void overworld_init(Overworld *overworld) {
 
 	sfView *const camera = sfView_createFromRect(
 		(sfFloatRect){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+	sfView_zoom(camera, 1 / OVERWORLD_SCALE);
 	overworld->camera = camera;
 }
 

@@ -6,11 +6,11 @@
 #include <SFML/Graphics.h>
 
 // These numbers are chosen very specifically
-// Any multiple of 120 will do because we use a fixed delta time of 1.0 / 60.0
-// to update the game and you have to evenly divide 64 to end on a tile
-// boundary. A speed of 60 would be moving 1 pixel per update.
-#define WALKING_SPEED 240
-#define RUNNING_SPEED 480
+// Any multiple of 60 will do because we use a fixed delta time of 1.0 / 60.0
+// to update the game. A speed of 60 would be moving 1 (map) pixel per update.
+// The map is scaled up by 4x on screen.
+#define WALKING_SPEED 120
+#define RUNNING_SPEED 120
 
 typedef struct {
 	sfVector2u pos;
