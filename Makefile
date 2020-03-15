@@ -1,4 +1,4 @@
-OUT := violet
+OUT := pocket_monsters_violet
 
 CC = gcc
 
@@ -14,10 +14,10 @@ LDLIBS := -lm -lcsfml-audio -lcsfml-graphics -lcsfml-window -lcsfml-system
 
 .PHONY: all clean
 
-run: all
-	./violet
-
 all: $(OUT)
+
+run: all
+	./$(OUT)
 
 $(OUT): $(OBJ)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
