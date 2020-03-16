@@ -6,18 +6,28 @@
 // All resources live for the entirety of the game which isn't a big deal
 // because the game is so small.
 
+#define MONSTER_SPRITE_SIZE 64
+
 // sfTextures need to be kept alive as long as sfSprites are in use, so keep a
 // reference to them here.
 typedef struct {
-	sfTexture *player_atlas;
-	sfTexture *tile_atlas;
+	sfTexture *player_atlas_texture;
+	sfTexture *battle_ui_atlas_texture;
+	sfTexture *battle_bg_texture;
+	sfTexture *monsters_front_texture;
+	sfTexture *tile_atlas_texture;
 
-	sfSprite *player_sprite;
+	sfSprite *player_idle;
+	sfSprite *battle_button_bg;
+	sfSprite *battle_bg;
+	sfSprite **monsters_front;
+	size_t num_monsters;
 	// @TODO: Tiles actually shouldn't be sprites. They should be Vertex
 	// Arrays for better performance.
-	sfSprite **tile_sprites;
+	sfSprite **tiles;
+	size_t num_tiles;
 
-	size_t num_tile_sprites;
+	sfFont *font;
 } Resources;
 
 // Global variable so each component has access to resources. Importantly, this

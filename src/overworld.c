@@ -28,8 +28,9 @@ void overworld_destroy(Overworld *overworld) {
 	sfView_destroy(overworld->camera);
 }
 
-void overworld_update(Overworld *overworld, double dt) {
-	player_update(overworld->player, overworld->map, dt);
+State overworld_update(Overworld *overworld, double dt) {
+	State new_state = player_update(overworld->player, overworld->map, dt);
+	return new_state;
 }
 
 void overworld_draw(Overworld *overworld, sfRenderWindow *window) {

@@ -17,8 +17,8 @@ typedef enum {
 // @NOTE: Third generation Pokemon games used 16x16 tile images and the screen
 // showed 15x10 tiles at a time
 #define TILE_SIZE 16
-#define SCREEN_WIDTH (4 * (TILE_SIZE) * (15))
-#define SCREEN_HEIGHT (4 * (TILE_SIZE) * (10))
+#define SCREEN_WIDTH ((4) * (TILE_SIZE) * (15))
+#define SCREEN_HEIGHT ((4) * (TILE_SIZE) * (10))
 
 typedef struct {
 	// The map is made up of equally sized sprites arranged in a 2D grid.

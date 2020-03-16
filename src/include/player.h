@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "states.h"
 #include "tilemap.h"
 
 #include <SFML/Graphics.h>
@@ -25,7 +26,7 @@ typedef struct {
 void player_init(Player *player, sfVector2u start_tile);
 void player_destroy(Player *player);
 
-void player_update(Player *player, const Tilemap *tilemap, double dt);
+State player_update(Player *player, const Tilemap *tilemap, double dt);
 void player_draw(Player *player, sfRenderWindow *window);
 
 #endif

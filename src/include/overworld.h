@@ -2,6 +2,7 @@
 #define OVERWORLD_H
 
 #include "player.h"
+#include "states.h"
 #include "tilemap.h"
 
 #include <SFML/Graphics.h>
@@ -15,7 +16,7 @@ typedef struct {
 void overworld_init(Overworld *overworld);
 void overworld_destroy(Overworld *overworld);
 
-void overworld_update(Overworld *overworld, double dt);
+State overworld_update(Overworld *overworld, double dt);
 void overworld_draw(Overworld *overworld, sfRenderWindow *window);
 
 #endif

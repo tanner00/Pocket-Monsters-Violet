@@ -9,7 +9,7 @@ OBJ_DIR := obj
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-CFLAGS := -Wall -Iinclude -g
+CFLAGS := -Wall -Iinclude -g -O2
 LDFLAGS :=
 LDLIBS := -lm -lcsfml-audio -lcsfml-graphics -lcsfml-window -lcsfml-system
 

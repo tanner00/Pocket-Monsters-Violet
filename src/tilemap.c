@@ -85,7 +85,6 @@ void tilemap_draw(const Tilemap *tilemap, sfRenderWindow *window,
 		  const sfView *camera) {
 	const sfVector2u dimensions = tilemap->dimensions;
 	const TileId *tiles = tilemap->tiles;
-	sfSprite *const *const tile_sprites = resources.tile_sprites;
 
 	const sfVector2f camera_center = sfView_getCenter(camera);
 	const sfVector2f camera_size = sfView_getSize(camera);
@@ -123,12 +122,11 @@ void tilemap_draw(const Tilemap *tilemap, sfRenderWindow *window,
 		for (size_t j = y_min; j < y_max; ++j) {
 			const TileId tile_id = tiles[i + j * dimensions.x];
 
-			sfSprite *tile_sprite = tile_sprites[tile_id];
+			sfSprite *tile_sprite = resources.tiles[tile_id];
 			sfSprite_setPosition(
 				tile_sprite,
 				(sfVector2f){i * TILE_SIZE, j * TILE_SIZE});
-			sfRenderWindow_drawSprite(window, tile_sprites[tile_id],
-						  NULL);
+			sfRenderWindow_drawSprite(window, tile_sprite, NULL);
 		}
 	}
 }

@@ -1,23 +1,28 @@
 #include "include/overworld.h"
 #include "include/resources.h"
+#include "include/state_manager.h"
 
 #include <SFML/Graphics.h>
 #include <SFML/Window.h>
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 int main(void) {
 
+	// @TODO: replace this with better RNG
+	srand(time(NULL));
+
 	const sfVideoMode mode = {SCREEN_WIDTH, SCREEN_HEIGHT, 32};
 	sfRenderWindow *window = sfRenderWindow_create(
-		mode, "Pocket Monsters: Violet", sfClose, NULL);
+		mode, "Pocket Monsters: Violet", sfResize | sfClose, NULL);
+	// @TODO: add option for fullscreen
 	sfRenderWindow_setVerticalSyncEnabled(window, true);
 
 	resources_init();
-
-	Overworld overworld;
-	overworld_init(&overworld);
+	state_manager_init();
 
 	// Each update moves the game a deterministic 1.0 / 60.0 seconds into
 	// the future
@@ -42,18 +47,18 @@ int main(void) {
 
 		// Simulate the world until it's caught up
 		while (accumulator >= dt) {
-			overworld_update(&overworld, dt);
+			state_manager_update(dt);
 			accumulator -= dt;
 		}
 
 		sfRenderWindow_clear(window, sfBlack);
 
-		overworld_draw(&overworld, window);
+		state_manager_draw(window);
 
 		sfRenderWindow_display(window);
 	}
 
-	overworld_destroy(&overworld);
+	state_manager_destroy();
 	sfClock_destroy(dt_clock);
 	sfRenderWindow_destroy(window);
 

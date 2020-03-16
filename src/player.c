@@ -1,4 +1,5 @@
 #include "include/player.h"
+#include "include/math.h"
 #include "include/resources.h"
 
 #include <assert.h>
@@ -12,7 +13,7 @@ void player_init(Player *player, sfVector2u start_tile) {
 
 void player_destroy(Player *player) {}
 
-void player_update(Player *player, const Tilemap *tilemap, double dt) {
+State player_update(Player *player, const Tilemap *tilemap, double dt) {
 	// velocity_normal tells which direction the player is going. You could
 	// avoid a vector for this but it simplifies if-else logic into vector
 	// multiplication.
@@ -59,6 +60,22 @@ void player_update(Player *player, const Tilemap *tilemap, double dt) {
 	// Move the player if they have a velocity
 	player->pos.x += player->speed * velocity_normal.x * dt;
 	player->pos.y += player->speed * velocity_normal.y * dt;
+
+	// If the player was considered moving before their location was
+	// updated and has now reached the destination tile after their position
+	// is updated, the player is considered to have just stopped.
+	if (moving && player->pos.x == player->dest.x &&
+	    player->pos.y == player->dest.y) {
+		TileId tile_on =
+			tilemap_get_tile(tilemap, to_tile_coords(player->pos));
+
+		// @TODO: Figure out what I want the encounter rate to be
+		if (tile_on == TALL_GRASS && random_range(1, 10) == 10) {
+			return BATTLE_STATE;
+		}
+	}
+
+	return OVERWORLD_STATE;
 }
 
 void player_draw(Player *player, sfRenderWindow *window) {
@@ -66,7 +83,7 @@ void player_draw(Player *player, sfRenderWindow *window) {
 	// because floats are too imprecise for tile movement and collision
 	const sfVector2f new_position =
 		(sfVector2f){(float)player->pos.x, (float)player->pos.y};
-	sfSprite_setPosition(resources.player_sprite, new_position);
+	sfSprite_setPosition(resources.player_idle, new_position);
 
-	sfRenderWindow_drawSprite(window, resources.player_sprite, NULL);
+	sfRenderWindow_drawSprite(window, resources.player_idle, NULL);
 }
