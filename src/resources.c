@@ -94,7 +94,7 @@ void resources_init(void) {
 			(sfIntRect){i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE});
 	}
 
-	sfImage *font_8x8 = sfImage_createFromFile("img2.png");
+	sfImage *font_8x8 = sfImage_createFromFile("res/font.png");
 	sfImage_createMaskFromColor(font_8x8, sfBlack, 0);
 	assert(font_8x8);
 	resources.font_8x8 = font_8x8;
