@@ -1,4 +1,5 @@
 #include "include/overworld.h"
+#include "include/resources.h"
 
 #include <assert.h>
 #include <stdlib.h>

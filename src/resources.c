@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 Resources resources;
 
@@ -93,9 +94,10 @@ void resources_init(void) {
 			(sfIntRect){i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE});
 	}
 
-	sfFont *font = sfFont_createFromFile("res/font.ttf");
-	assert(font);
-	resources.font = font;
+	sfImage *font_8x8 = sfImage_createFromFile("img2.png");
+	sfImage_createMaskFromColor(font_8x8, sfBlack, 0);
+	assert(font_8x8);
+	resources.font_8x8 = font_8x8;
 }
 
 void resources_destroy(void) {
@@ -110,5 +112,43 @@ void resources_destroy(void) {
 	}
 	sfTexture_destroy(resources.player_atlas_texture);
 
-	sfFont_destroy(resources.font);
+	sfImage_destroy(resources.font_8x8);
+}
+
+// SFML's interface for drawing text forces fonts to be anti-aliased. In the
+// general case, this is good. However, for text being rendered at such a small
+// scale with a font that's supposed to be pixelated, this destroys the look of
+// the text. I made the decision to make my own simple text renderer using a
+// monospace bitmap font I found (on this page
+// https://www.seasip.info/VintagePC/cga.html).
+// Every character is 8x8 and the font uses the same order as ASCII, so
+// it's very easy to take an ASCII character code and convert it into where the
+// top left of a character will be in the image.
+DrawPair draw_text(const char *text, sfColor color, double scale) {
+	size_t len = strlen(text);
+	size_t image_width = len * 8;
+	size_t image_height = 8;
+	sfImage *text_image = sfImage_create(image_width, image_height);
+	for (size_t i = 0; i < len; ++i) {
+		sfIntRect src;
+		// The font image has 32 characters per row
+		src.left = (text[i] % 32) * 8;
+		src.top = (text[i] / 32) * 8;
+		src.width = 32;
+		src.height = 32;
+
+		sfImage_copyImage(text_image, resources.font_8x8, i * 8, 0, src,
+				  false);
+	}
+
+	sfTexture *text_texture = sfTexture_createFromImage(text_image, NULL);
+
+	sfSprite *rendered_text = sfSprite_create();
+	sfSprite_setTexture(rendered_text, text_texture, false);
+	sfSprite_setScale(rendered_text, (sfVector2f){scale, scale});
+	sfSprite_setColor(rendered_text, color);
+
+	sfImage_destroy(text_image);
+
+	return (DrawPair){text_texture, rendered_text};
 }

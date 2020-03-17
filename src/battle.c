@@ -10,9 +10,13 @@
 			SCREEN_HEIGHT / BATTLE_SCALE                           \
 	}
 
+DrawPair text;
+
 void battle_init(Battle *battle) {
 	sfView *const camera = sfView_createFromRect(BATTLE_VIEW);
 	battle->camera = camera;
+
+	text = draw_text("test", sfBlue, 2.0);
 }
 
 void battle_destroy(Battle *battle) {}
@@ -43,19 +47,6 @@ void battle_draw(Battle *battle, sfRenderWindow *window) {
 			     (sfVector2f){155, 12});
 	sfRenderWindow_drawSprite(window, resources.monsters_front[1], NULL);
 
-	/* unsigned int size = 20; */
-	/* sfGlyph glyph = sfFont_getGlyph(resources.font, 'A', size, false); */
-	/* sfTexture *bitmap = sfFont_getTexture(resources.font, size); */
-
-	/* sfImage *image = */
-	/* 	sfImage_create(glyph.bounds.width, glyph.bounds.height); */
-	/* sfImage_copy(sfTexture_copyToImage(bitmap), 0, 0, glyph.textureRect);
-	 */
-	/* sfText *draw = sfText_create(); */
-	/* sfText_setFont(draw, resources.font); */
-	/* sfText_setCharacterSize(draw, 24); */
-	/* sfText_setString(draw, "Run"); */
-	/* sfText_setPosition(draw, (sfVector2f){0, 0}); */
-	/* sfRenderWindow_drawText(window, draw, NULL); */
-	/* sfText_destroy(draw); */
+	sfSprite_setPosition(text.sprite, (sfVector2f){30, 120});
+	sfRenderWindow_drawSprite(window, text.sprite, NULL);
 }

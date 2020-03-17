@@ -11,6 +11,8 @@
 // sfTextures need to be kept alive as long as sfSprites are in use, so keep a
 // reference to them here.
 typedef struct {
+	sfImage *font_8x8;
+
 	sfTexture *player_atlas_texture;
 	sfTexture *battle_ui_atlas_texture;
 	sfTexture *battle_bg_texture;
@@ -26,8 +28,6 @@ typedef struct {
 	// Arrays for better performance.
 	sfSprite **tiles;
 	size_t num_tiles;
-
-	sfFont *font;
 } Resources;
 
 // Global variable so each component has access to resources. Importantly, this
@@ -37,5 +37,14 @@ extern Resources resources;
 
 void resources_init(void);
 void resources_destroy(void);
+
+// Throw a texture back at the caller so it can be destroyed after its no longer
+// needed.
+typedef struct {
+	sfTexture *texture;
+	sfSprite *sprite;
+} DrawPair;
+
+DrawPair draw_text(const char *text, sfColor color, double scale);
 
 #endif
