@@ -5,6 +5,10 @@ StateManager state_manager;
 void state_manager_init(void) {
 	state_manager.current_state = OVERWORLD_STATE;
 	overworld_init(&state_manager.overworld);
+
+	// @FIXME: just for testing
+	state_manager.current_state = BATTLE_STATE;
+	battle_init(&state_manager.battle);
 }
 
 void state_manager_destroy(void) {

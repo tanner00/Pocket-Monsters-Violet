@@ -18,18 +18,32 @@ sfSprite *make_cutout_sprite(const sfTexture *texture, sfIntRect cutout) {
 	return sprite;
 }
 
-// @TODO: Separate this into different components when there are more resources
+// @TODO: Separate this into different components when there are more resources.
+// Split into related parts (battle, overworld, etc...)
 void resources_init(void) {
+
+	sfImage *font_8x8 = sfImage_createFromFile("res/font.png");
+	assert(font_8x8);
+	resources.font_8x8 = font_8x8;
+
 	// Load textures
 	sfTexture *const player_atlas_texture =
 		sfTexture_createFromFile("res/player.png", NULL);
 	assert(player_atlas_texture);
 	resources.player_atlas_texture = player_atlas_texture;
 
-	sfTexture *battle_ui_atlas_texture =
+	// The tiles are stored in a big image which has dimensions
+	// (16*n)x16 where n is the number of tiles. This layout makes it easy
+	// to go from TileId to what sprite should be rendered on screen.
+	sfTexture *const tile_atlas_texture =
+		sfTexture_createFromFile("res/tileset.png", NULL);
+	assert(tile_atlas_texture);
+	resources.tile_atlas_texture = tile_atlas_texture;
+
+	sfTexture *battle_ui_texture =
 		sfTexture_createFromFile("res/battle_ui.png", NULL);
-	assert(battle_ui_atlas_texture);
-	resources.battle_ui_atlas_texture = battle_ui_atlas_texture;
+	assert(battle_ui_texture);
+	resources.battle_ui_texture = battle_ui_texture;
 
 	sfTexture *const battle_bg_texture =
 		sfTexture_createFromFile("res/battle_bg.png", NULL);
@@ -43,22 +57,28 @@ void resources_init(void) {
 	assert(monsters_front_texture);
 	resources.monsters_front_texture = monsters_front_texture;
 
-	// The tiles are stored in a big image which has dimensions
-	// (16*n)x16 where n is the number of tiles. This layout makes it easy
-	// to go from TileId to what sprite should be rendered on screen.
-	sfTexture *const tile_atlas_texture =
-		sfTexture_createFromFile("res/tileset.png", NULL);
-	assert(tile_atlas_texture);
-	resources.tile_atlas_texture = tile_atlas_texture;
-
 	// Use loaded textures to make sprites
 	sfSprite *player_idle = make_cutout_sprite(
 		player_atlas_texture, (sfIntRect){0, 0, TILE_SIZE, TILE_SIZE});
 	resources.player_idle = player_idle;
 
-	sfSprite *battle_button_bg = make_cutout_sprite(
-		battle_ui_atlas_texture, (sfIntRect){0, 0, 240, 45});
+	const size_t num_tiles =
+		sfTexture_getSize(tile_atlas_texture).x / TILE_SIZE;
+	sfSprite **const tiles = malloc(num_tiles * sizeof(*tiles));
+	assert(tiles);
+	resources.tiles = tiles;
+	resources.num_tiles = num_tiles;
+	// Fill out all the information for each sprite in the tile atlas.
+	for (size_t i = 0; i < num_tiles; ++i) {
+		tiles[i] = make_cutout_sprite(
+			tile_atlas_texture,
+			(sfIntRect){i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE});
+	}
+
+	sfSprite *battle_button_bg = sfSprite_create();
+	assert(battle_button_bg);
 	resources.battle_button_bg = battle_button_bg;
+	sfSprite_setTexture(battle_button_bg, battle_ui_texture, true);
 
 	sfSprite *battle_bg = sfSprite_create();
 	assert(battle_bg);
@@ -81,38 +101,45 @@ void resources_init(void) {
 				    MONSTER_SPRITE_SIZE, MONSTER_SPRITE_SIZE});
 	}
 
-	const size_t num_tiles =
-		sfTexture_getSize(tile_atlas_texture).x / TILE_SIZE;
-	sfSprite **const tiles = malloc(num_tiles * sizeof(*tiles));
-	assert(tiles);
-	resources.tiles = tiles;
-	resources.num_tiles = num_tiles;
-	// Fill out all the information for each sprite in the tile atlas.
-	for (size_t i = 0; i < num_tiles; ++i) {
-		tiles[i] = make_cutout_sprite(
-			tile_atlas_texture,
-			(sfIntRect){i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE});
-	}
+	sfRectangleShape *const move_button = sfRectangleShape_create();
+	assert(move_button);
+	resources.move_button = move_button;
+	// Dimensions of the transparent button areas in res/battle_ui.png
+	sfRectangleShape_setSize(move_button, (sfVector2f){89, 18});
 
-	sfImage *font_8x8 = sfImage_createFromFile("res/font.png");
-	sfImage_createMaskFromColor(font_8x8, sfBlack, 0);
-	assert(font_8x8);
-	resources.font_8x8 = font_8x8;
+	resources.battle_action_text =
+		malloc(3 * sizeof(*resources.battle_action_text));
+	resources.battle_action_text[0] = draw_text("Items", sfWhite, 1.0);
+	resources.battle_action_text[1] = draw_text("Switch", sfWhite, 1.0);
+	resources.battle_action_text[2] = draw_text("Run", sfWhite, 1.0);
 }
 
 void resources_destroy(void) {
-	sfSprite_destroy(resources.player_idle);
+	sfImage_destroy(resources.font_8x8);
+
 	sfTexture_destroy(resources.player_atlas_texture);
+	sfTexture_destroy(resources.tile_atlas_texture);
 
-	sfSprite_destroy(resources.battle_bg);
+	sfTexture_destroy(resources.battle_ui_texture);
 	sfTexture_destroy(resources.battle_bg_texture);
+	sfTexture_destroy(resources.monsters_front_texture);
 
+	sfSprite_destroy(resources.player_idle);
 	for (size_t i = 0; i < resources.num_tiles; ++i) {
 		sfSprite_destroy(resources.tiles[i]);
 	}
-	sfTexture_destroy(resources.player_atlas_texture);
 
-	sfImage_destroy(resources.font_8x8);
+	sfSprite_destroy(resources.battle_button_bg);
+	sfSprite_destroy(resources.battle_bg);
+	for (size_t i = 0; i < resources.num_monsters; ++i) {
+		sfSprite_destroy(resources.monsters_front[i]);
+	}
+
+	sfRectangleShape_destroy(resources.move_button);
+	for (size_t i = 0; i < 3; ++i) {
+		sfTexture_destroy(resources.battle_action_text[i].texture);
+		sfSprite_destroy(resources.battle_action_text[i].sprite);
+	}
 }
 
 // SFML's interface for drawing text forces fonts to be anti-aliased. In the
@@ -124,11 +151,12 @@ void resources_destroy(void) {
 // Every character is 8x8 and the font uses the same order as ASCII, so
 // it's very easy to take an ASCII character code and convert it into where the
 // top left of a character will be in the image.
-DrawPair draw_text(const char *text, sfColor color, double scale) {
-	size_t len = strlen(text);
-	size_t image_width = len * 8;
-	size_t image_height = 8;
-	sfImage *text_image = sfImage_create(image_width, image_height);
+DrawableText draw_text(const char *text, sfColor color, double scale) {
+	const size_t len = strlen(text);
+	const size_t image_width = len * 8;
+	const size_t image_height = 8;
+	sfImage *const text_image = sfImage_create(image_width, image_height);
+	assert(text_image);
 	for (size_t i = 0; i < len; ++i) {
 		sfIntRect src;
 		// The font image has 32 characters per row
@@ -141,14 +169,21 @@ DrawPair draw_text(const char *text, sfColor color, double scale) {
 				  false);
 	}
 
-	sfTexture *text_texture = sfTexture_createFromImage(text_image, NULL);
+	sfTexture *const text_texture =
+		sfTexture_createFromImage(text_image, NULL);
+	assert(text_texture);
 
-	sfSprite *rendered_text = sfSprite_create();
+	sfSprite *const rendered_text = sfSprite_create();
+	assert(rendered_text);
 	sfSprite_setTexture(rendered_text, text_texture, false);
 	sfSprite_setScale(rendered_text, (sfVector2f){scale, scale});
 	sfSprite_setColor(rendered_text, color);
 
 	sfImage_destroy(text_image);
 
-	return (DrawPair){text_texture, rendered_text};
+	DrawableText finished_text;
+	finished_text.texture = text_texture;
+	finished_text.sprite = rendered_text;
+	finished_text.len = len;
+	return finished_text;
 }
